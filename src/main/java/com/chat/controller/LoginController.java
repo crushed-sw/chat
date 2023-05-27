@@ -1,10 +1,9 @@
 package com.chat.controller;
 
+import com.chat.anntation.UserLoginToken;
 import com.chat.entity.MessageJson;
 import com.chat.entity.ReplayLoginMessage;
-import com.chat.entity.User;
 import com.chat.service.LoginService;
-import com.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +18,7 @@ public class LoginController {
 	 * @param messageJson
 	 * @return
 	 */
-	@GetMapping
+	@PostMapping
 	public ReplayLoginMessage getUserById(@RequestBody MessageJson messageJson) {
 		return loginService.getReplayLoginMessage(messageJson.getUserId(), messageJson.getPassword());
 	}

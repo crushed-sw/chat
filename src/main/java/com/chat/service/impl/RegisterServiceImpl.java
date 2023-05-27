@@ -4,6 +4,7 @@ import com.chat.entity.ReplayRegisterMessage;
 import com.chat.entity.User;
 import com.chat.service.RegisterService;
 import com.chat.service.UserService;
+import com.chat.util.CommondUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,8 @@ public class RegisterServiceImpl implements RegisterService {
 	}
 
 	private ReplayRegisterMessage judgeNotNull(String userId, String password, String userName) {
-		if(userId == null || userId.trim().equals("")
-		|| password == null || password.trim().equals("")) {
-			return new ReplayRegisterMessage(false, ReplayRegisterMessage.USER_ID_OR_PASSWORD_NULL);
+		if(CommondUtil.judgeStringEmpty(userId) || CommondUtil.judgeStringEmpty(password)) {
+			return ReplayRegisterMessage.USER_ID_OR_PASSWORD_NULL;
 		}
 		return judgeExist(userId, password, userName);
 	}
@@ -28,16 +28,16 @@ public class RegisterServiceImpl implements RegisterService {
 	private ReplayRegisterMessage judgeExist(String userId, String password, String userName) {
 		User user = userService.getUserById(userId);
 		if(user != null) {
-			return new ReplayRegisterMessage(false, ReplayRegisterMessage.USER_ID_EXIT);
+			return ReplayRegisterMessage.USER_ID_EXIT;
 		}
 		return judgeNameIsDefault(userId, password, userName);
 	}
 
 	private ReplayRegisterMessage judgeNameIsDefault(String userId, String password, String userName) {
-		if(userName == null || userName.trim().equals("")) {
+		if(CommondUtil.judgeStringEmpty(userName)) {
 			userName = userId;
 		}
 		userService.insertUser(userId, userName, password);
-		return new ReplayRegisterMessage(true, 0, userId, password);
+		return ReplayRegisterMessage.getSucceedRegister(userId, password);
 	}
 }

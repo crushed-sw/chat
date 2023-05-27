@@ -2,7 +2,6 @@ package com.chat.controller;
 
 import com.chat.entity.MessageJson;
 import com.chat.entity.ReplayRegisterMessage;
-import com.chat.entity.User;
 import com.chat.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

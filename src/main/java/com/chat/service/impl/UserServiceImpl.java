@@ -14,9 +14,8 @@ public class UserServiceImpl implements UserService {
 	private UserRepository repository;
 
 	@Override
-	public boolean insertUser(String userId, String userName, String password) {
+	public void insertUser(String userId, String userName, String password) {
 		repository.save(new User(userId, userName, password));
-		return true;
 	}
 
 	@Override
@@ -30,14 +29,42 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean deleteById(String userId) {
+	public void deleteById(String userId) {
 		repository.deleteById(userId);
-		return true;
 	}
 
 	@Override
-	public boolean updateUserById(User user) {
+	public void updateUserById(User user) {
 		repository.save(user);
-		return true;
+	}
+
+	@Override
+	public void insertFriend(String groupName, String userId) {
+
+	}
+
+	@Override
+	public void deleteFriend(String userId) {
+
+	}
+
+	@Override
+	public void updateFriend(String oldGroupName, String newGroupName, String userId) {
+
+	}
+
+	@Override
+	public void insertGroup(String groupId) {
+
+	}
+
+	@Override
+	public void deleteGroup(String groupId) {
+
+	}
+
+	@Override
+	public void updateGroup(String groupId, String groupName) {
+
 	}
 }

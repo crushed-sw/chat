@@ -6,5 +6,5 @@ import lombok.Data;
 public class MessageJson {
 	private String userId;
 	private String password;
-	private String UserName;
+	private String userName;
 }
