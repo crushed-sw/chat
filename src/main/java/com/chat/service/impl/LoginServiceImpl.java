@@ -45,6 +45,7 @@ public class LoginServiceImpl implements LoginService {
 		if(!Objects.equals(user.getPassword(), password)) {
 			return ReplayLoginMessage.USER_PASSWORD_WORING;
 		}
+
 		String token = JwtUtil.createJWT(userId);
 		if(redisUtil.hashKey("token", userId)) {
 			redisUtil.delete("token", userId);
@@ -52,6 +53,12 @@ public class LoginServiceImpl implements LoginService {
 		Map<String, String> map = new HashMap<>();
 		map.put(userId, token);
 		redisUtil.add("token", map);
-		return ReplayLoginMessage.setSucceedLogin(token, userId, password);
+
+		String userName = user.getUserName();
+		if(CommondUtil.judgeStringEmpty(userName)) {
+			userName = userId;
+		}
+
+		return ReplayLoginMessage.setSucceedLogin(token, userId, userName, user.getAvatar());
 	}
 }

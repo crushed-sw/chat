@@ -1,17 +1,28 @@
 package com.chat.service.impl;
 
+import com.chat.entity.Friend;
 import com.chat.entity.User;
+import com.chat.entity.UserInFriend;
+import com.chat.mapper.UserMapping;
 import com.chat.mapper.UserRepository;
 import com.chat.service.UserService;
+import com.chat.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository repository;
+
+	@Autowired
+	private UserMapping userMapping;
+
+	@Autowired
+	private RedisUtil redisUtil;
 
 	@Override
 	public void insertUser(String userId, String userName, String password) {
@@ -38,33 +49,4 @@ public class UserServiceImpl implements UserService {
 		repository.save(user);
 	}
 
-	@Override
-	public void insertFriend(String groupName, String userId) {
-
-	}
-
-	@Override
-	public void deleteFriend(String userId) {
-
-	}
-
-	@Override
-	public void updateFriend(String oldGroupName, String newGroupName, String userId) {
-
-	}
-
-	@Override
-	public void insertGroup(String groupId) {
-
-	}
-
-	@Override
-	public void deleteGroup(String groupId) {
-
-	}
-
-	@Override
-	public void updateGroup(String groupId, String groupName) {
-
-	}
 }

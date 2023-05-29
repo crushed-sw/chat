@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 反馈group请求类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

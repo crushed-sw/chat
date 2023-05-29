@@ -4,15 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-/**
- * 用户里显示好友的结构类
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInFriend {
+public class FriendMessageJson {
+	private String userId;
+	private String friendId;
 	private String groupName;
-	private List<Friend> friends;
+	private String newGroupName;
 }

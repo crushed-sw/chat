@@ -4,14 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 接受客户端json类
- */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class MessageJson {
+@AllArgsConstructor
+public class GroupMessageJson {
 	private String userId;
-	private String password;
-	private String userName;
+	private String groupId;
 }

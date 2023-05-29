@@ -14,7 +14,7 @@ public class RegisterServiceImpl implements RegisterService {
 	UserService userService;
 
 	@Override
-	public ReplayRegisterMessage getREgisterMessage(String userId, String password, String userName) {
+	public ReplayRegisterMessage getRegisterMessage(String userId, String password, String userName) {
 		return judgeNotNull(userId, password, userName);
 	}
 
@@ -38,6 +38,6 @@ public class RegisterServiceImpl implements RegisterService {
 			userName = userId;
 		}
 		userService.insertUser(userId, userName, password);
-		return ReplayRegisterMessage.getSucceedRegister(userId, password);
+		return ReplayRegisterMessage.getSucceedRegister(userId);
 	}
 }

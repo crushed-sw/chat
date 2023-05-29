@@ -14,15 +14,13 @@ public class ReplayRegisterMessage {
 	private boolean succeed;
 	private Integer state;
 	private String userId;
-	private String password;
 
 	public ReplayRegisterMessage(boolean succeed, Integer state) {
-		this(succeed, state, "", "");
+		this(succeed, state, "");
 	}
 
-	public static ReplayRegisterMessage getSucceedRegister(String userId, String password) {
+	public static ReplayRegisterMessage getSucceedRegister(String userId) {
 		ReplayRegisterMessage.SUCCEED_REGISTER.setUserId(userId);
-		ReplayRegisterMessage.SUCCEED_REGISTER.setPassword(password);
 		return ReplayRegisterMessage.SUCCEED_REGISTER;
 	}
 }

@@ -9,6 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 好友聊天记录类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,8 +23,8 @@ public class FriendChatRecord {
 	private String userIdTwo;
 	private List<Chitchat> record;
 
-	public FriendChatRecord(Long friendId, String userIdOne, String userIdTwo) {
-		this.friendId = String.valueOf(friendId);
+	public FriendChatRecord(String friendId, String userIdOne, String userIdTwo) {
+		this.friendId = friendId;
 		this.userIdOne = userIdOne;
 		this.userIdTwo = userIdTwo;
 		this.record = new ArrayList<>();

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * 聊天记录类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

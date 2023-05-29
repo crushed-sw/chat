@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.ResourceBundle;
 
+/**
+ * mongodb工具类
+ */
 @Component
 @Data
 public class MongoUtil {
@@ -30,6 +33,11 @@ public class MongoUtil {
 		mongoDatabase = mongoClient.getDatabase(database);
 	}
 
+	/**
+	 * 获取数据库集合对象
+	 * @param collection
+	 * @return
+	 */
 	static public MongoCollection<Document> getDatabase(String collection) {
 		return mongoDatabase.getCollection(collection);
 	}

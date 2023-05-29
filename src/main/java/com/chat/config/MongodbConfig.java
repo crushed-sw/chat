@@ -9,6 +9,9 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 
+/**
+ * mongodb配置类
+ */
 @Configuration
 public class MongodbConfig implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -17,6 +20,10 @@ public class MongodbConfig implements ApplicationListener<ContextRefreshedEvent>
 
 	private static final String TYPEKEY = "_class";
 
+	/**
+	 * 将集合的 _class 去掉
+	 * @param event
+	 */
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		MongoConverter converter = oneMongoTemplate.getConverter();

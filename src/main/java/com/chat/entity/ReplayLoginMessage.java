@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,15 +19,17 @@ public class ReplayLoginMessage {
 	private String token;
 	private String userId;
 	private String userName;
+	private String avatar;
 
 	public ReplayLoginMessage(boolean succeed, Integer errStatus) {
-		this(succeed, errStatus, "", "", "");
+		this(succeed, errStatus, "", "", "", "");
 	}
 
-	public static ReplayLoginMessage setSucceedLogin(String token, String userId, String userName) {
+	public static ReplayLoginMessage setSucceedLogin(String token, String userId, String userName, String avatar) {
 		ReplayLoginMessage.SUCCEED_LOGIN.setToken(token);
 		ReplayLoginMessage.SUCCEED_LOGIN.setUserId(userId);
 		ReplayLoginMessage.SUCCEED_LOGIN.setUserName(userName);
+		ReplayLoginMessage.SUCCEED_LOGIN.setAvatar(avatar);
 		return ReplayLoginMessage.SUCCEED_LOGIN;
 	}
 }
