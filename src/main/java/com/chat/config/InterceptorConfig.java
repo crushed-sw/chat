@@ -23,7 +23,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
 	/**
 	 * 创建类
-	 * @return
+	 * @return AuthenticationInterceptor 对象
 	 */
 	@Bean
 	public AuthenticationInterceptor getAuthenticationInterceptor() {

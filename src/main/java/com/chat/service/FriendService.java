@@ -1,7 +1,6 @@
 package com.chat.service;
 
-import com.chat.entity.ReplayFriend;
-import com.chat.entity.User;
+import com.chat.entity.replay.ReplayFriend;
 import com.chat.entity.UserInFriend;
 
 import java.util.List;
@@ -12,7 +11,8 @@ public interface FriendService {
 	void deleteFriendById(String userId, String groupName, String friendId);
 	void updateFriendById(String userId, String oldGroupName, String newGroupName, String friendId);
 	ReplayFriend getReplayFriend(String userId);
-	void insertFriendGroup(String userId, String groupName);
+	boolean insertFriendGroup(String userId, String groupName);
 	void deleteFriendGroup(String userId, String groupName);
-	void updateFriendGroup(String userId, String groupName, String newGroupName);
+	boolean addFriend(String userId, String friendId, String groupName);
+	boolean isFriend(String userId, String friendId);
 }

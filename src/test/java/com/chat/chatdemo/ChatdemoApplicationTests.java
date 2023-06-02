@@ -1,6 +1,8 @@
 package com.chat.chatdemo;
 
 import com.chat.entity.GroupChatRecord;
+import com.chat.entity.Notice;
+import com.chat.entity.NoticeMessage;
 import com.chat.entity.User;
 import com.chat.mapper.*;
 import com.chat.service.UserService;
@@ -29,18 +31,22 @@ class ChatdemoApplicationTests {
 	GroupRepository groupRepository;
 	@Autowired
 	GroupMapping groupMapping;
+	@Autowired
+	NoticeMapping noticeMapping;
+	@Autowired
+	NoticeRepository noticeRepository;
 
 	@Autowired
 	RedisUtil redisUtil;
 
 	@Test
 	void getRedis() {
-		System.out.println((String) redisUtil.get("friendEachId"));
+		System.out.println((String) redisUtil.get("groupId"));
 	}
 
 	@Test
 	void setRedis() {
-		redisUtil.set("friendEachId", "1");
+		redisUtil.set("groupId", "1");
 	}
 
 	@Test
@@ -62,7 +68,7 @@ class ChatdemoApplicationTests {
 
 	@Test
 	void deleteUser() {
-		userService.deleteById("7777");
+		userService.deleteById("101");
 	}
 
 	@Test
@@ -113,7 +119,7 @@ class ChatdemoApplicationTests {
 
 	@Test
 	void insertGroupRecord() {
-		groupRepository.save(new GroupChatRecord("111", "222", "", "", new ArrayList<>(), new ArrayList<>()));
+		groupRepository.save(new GroupChatRecord("111", "222", CommondUtil.getAvatar(), "", new ArrayList<>(), new ArrayList<>()));
 	}
 
 	@Test
@@ -135,5 +141,30 @@ class ChatdemoApplicationTests {
 	@Test
 	void renameGroup() {
 		groupMapping.updateName("111", "haha");
+	}
+
+	@Test
+	void setNotice() {
+		Notice notice = new Notice("123456", new ArrayList<>());
+		noticeRepository.save(notice);
+	}
+
+	@Test
+	void addNoticeMessage() {
+		//NoticeMessage notice = new NoticeMessage(NoticeMessage.MESSAGE_ADDED, "000", "tianjia");
+		//noticeMapping.addMessage("123456", notice);
+		//noticeMapping.addMessage("123456", notice);
+		//noticeMapping.addMessage("123456", notice);
+		//noticeMapping.addMessage("123456", notice);
+	}
+
+	@Test
+	void updateNoticeMessage() {
+		//noticeMapping.updateMessage("123456", "000", 1, 5);
+	}
+
+	@Test
+	void getRedisHuancun() {
+		System.out.println(redisUtil.getMapString("chat-888", "notice"));
 	}
 }

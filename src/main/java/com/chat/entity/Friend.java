@@ -15,4 +15,5 @@ public class Friend {
 	private String friendId;
 	private String friendName;
 	private String friendEachId;
+	private Integer number;
 }

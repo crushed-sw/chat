@@ -1,23 +1,23 @@
 package com.chat.controller;
 
 import com.chat.anntation.UserLoginToken;
-import com.chat.entity.FriendMessageJson;
-import com.chat.entity.ReplayFriend;
+import com.chat.entity.recive.FriendMessageJson;
+import com.chat.entity.replay.ReplayFriend;
 import com.chat.service.FriendService;
-import com.chat.websocket.Chat;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ *
+ */
 @Slf4j
 @RestController
 @RequestMapping("/chat/friend")
 public class FriendController {
 	@Autowired
 	FriendService friendService;
-	@Autowired
-	Chat chat;
 
 	@UserLoginToken
 	@GetMapping
@@ -25,6 +25,29 @@ public class FriendController {
 		String userId = (String) req.getAttribute("userId");
 		log.info("[servlet] " + userId + " 获取好友列表");
 		return friendService.getReplayFriend(userId);
+	}
+
+	@UserLoginToken
+	@PostMapping
+	public ReplayFriend insertFriend(@RequestBody FriendMessageJson message) {
+		String userId = message.getUserId();
+		String friendId = message.getFriendId();
+		String groupName = message.getGroupName();
+
+		ReplayFriend replay = friendService.getReplayFriend(userId);
+		if (userId.equals(friendId)) {
+			replay.setStatus(ReplayFriend.ADD_SELF);
+			log.info("[servlet] " + userId + " 添加自己为好友 " + friendId);
+		} else if(friendService.isFriend(userId, friendId)) {
+			replay.setStatus(ReplayFriend.ALREADY_ADDED);
+			log.info("[servlet] " + userId + " 添加已添加好友 " + friendId);
+		} else if(!friendService.addFriend(userId, friendId, groupName)) {
+			replay.setStatus(ReplayFriend.FRIEND_ID_NOT_EXIT);
+			log.info("[servlet] " + userId + " 添加好友 " + friendId + " 不存在");
+		} else {
+			log.info("[servlet] " + userId + " 添加好友 " + friendId);
+		}
+		return replay;
 	}
 
 	@UserLoginToken

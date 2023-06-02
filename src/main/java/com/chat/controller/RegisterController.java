@@ -1,7 +1,7 @@
 package com.chat.controller;
 
-import com.chat.entity.MessageJson;
-import com.chat.entity.ReplayRegisterMessage;
+import com.chat.entity.recive.MessageJson;
+import com.chat.entity.replay.ReplayRegisterMessage;
 import com.chat.service.RegisterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,8 @@ public class RegisterController {
 
 	/**
 	 * 注册反馈
-	 * @param messageJson
-	 * @return
+	 * @param messageJson 前端传入Json
+	 * @return 返回Json对象
 	 */
 	@PostMapping
 	public ReplayRegisterMessage register(@RequestBody MessageJson messageJson) {

@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
 	@Autowired
 	private RedisTemplate redisTemplate;
+
 	/**
 	 * 给一个指定的 key 值附加过期时间
 	 *
@@ -186,7 +187,7 @@ public class RedisUtil {
 	 * @return
 	 */
 	public Object pop(String key) {
-		return redisTemplate.opsForSet().pop("setValue");
+		return redisTemplate.opsForSet().pop(key);
 	}
 
 	/**
@@ -398,7 +399,7 @@ public class RedisUtil {
      * @return
      */
     public Object index(String key, long index) {
-        return redisTemplate.opsForList().index("list", 1);
+        return redisTemplate.opsForList().index(key, index);
     }
  
     /**

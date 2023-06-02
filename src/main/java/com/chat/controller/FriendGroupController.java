@@ -1,10 +1,9 @@
 package com.chat.controller;
 
 import com.chat.anntation.UserLoginToken;
-import com.chat.entity.FriendMessageJson;
-import com.chat.entity.ReplayFriend;
+import com.chat.entity.recive.FriendMessageJson;
+import com.chat.entity.replay.ReplayFriend;
 import com.chat.service.FriendService;
-import com.chat.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,14 @@ public class FriendGroupController {
 		String userId = messageJson.getUserId();
 		String groupName = messageJson.getGroupName();
 		log.info("[servlet] " + userId + " 新建分组 " + groupName);
-		friendService.insertFriendGroup(userId, groupName);
-		return friendService.getReplayFriend(userId);
+
+		boolean flag = friendService.insertFriendGroup(userId, groupName);
+		ReplayFriend replayFriend = friendService.getReplayFriend(userId);
+		if(!flag) {
+			replayFriend.setStatus(ReplayFriend.GROUP_NAME_SAME);
+		}
+
+		return replayFriend;
 	}
 
 	@UserLoginToken

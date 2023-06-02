@@ -35,16 +35,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	/**
 	 * 在执请求之前验证token是否正确
-	 * @param request
-	 * @param response
-	 * @param handler
-	 * @return
-	 * @throws Exception
+	 * @param request HttpServletRequest对象
+	 * @param response HttpServletResponse对象
 	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		 // 判断是否是函数处理器
-		if(!(handler instanceof HandlerMethod)) {
+		if(!(handler instanceof HandlerMethod handlerMethod)) {
 			return true;
 		}
 
@@ -69,7 +66,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 			return false;
 		}
 
-		HandlerMethod handlerMethod = (HandlerMethod) handler;
 		Method method = handlerMethod.getMethod();
 
 		// 将PassToken注解的函数直接放行

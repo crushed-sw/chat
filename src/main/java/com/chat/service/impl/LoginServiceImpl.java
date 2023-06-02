@@ -1,6 +1,6 @@
 package com.chat.service.impl;
 
-import com.chat.entity.ReplayLoginMessage;
+import com.chat.entity.replay.ReplayLoginMessage;
 import com.chat.entity.User;
 import com.chat.service.LoginService;
 import com.chat.service.UserService;

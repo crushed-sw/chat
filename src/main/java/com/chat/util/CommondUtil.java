@@ -1,13 +1,20 @@
 package com.chat.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
  * 通用工具类
  */
+@Component
 public class CommondUtil {
+	@Autowired
+	RedisUtil redisUtil;
 	public static List<String> picture;
 
 	static {
@@ -62,15 +69,21 @@ public class CommondUtil {
 	 * 获取最小可用friendEachId
 	 * @return
 	 */
-	public static String getFriendEachId() {
+	public String getFriendEachId() {
 		RedisUtil redisUtil = new RedisUtil();
-		return (String) redisUtil.get("friendEachId");
+		String friendEachId = "1";
+		try {
+			friendEachId = (String) redisUtil.get("friendEachId");
+		} catch (Exception e) {
+			redisUtil.set("friendEachId", "1");
+		}
+		return friendEachId;
 	}
 
 	/**
 	 * 更新最小可用friendEachId
 	 */
-	public static void incFriendEachId() {
+	public void incFriendEachId() {
 		RedisUtil redisUtil = new RedisUtil();
 		int id = Integer.parseInt(getFriendEachId());
 		id++;
@@ -81,18 +94,37 @@ public class CommondUtil {
 	 * 获取最小可用groupId
 	 * @return
 	 */
-	public static String getGroupId() {
+	public String getGroupId() {
 		RedisUtil redisUtil = new RedisUtil();
-		return (String) redisUtil.get("groupId");
+		String groupId = "1";
+		try {
+			groupId = (String) redisUtil.get("groupId");
+		} catch (Exception e) {
+			redisUtil.set("groupId", "1");
+		}
+		return groupId;
 	}
 
 	/**
 	 * 更新最小可用groupId
 	 */
-	public static void incGroupId() {
+	public void incGroupId() {
 		RedisUtil redisUtil = new RedisUtil();
 		int id = Integer.parseInt(getGroupId());
 		id++;
 		redisUtil.set("groupId", Integer.toString(id));
+	}
+
+	public static String mapToJson(Map<Object, Object> map) {
+		StringBuilder sb = new StringBuilder("{");
+		for (Map.Entry<Object, Object> entry : map.entrySet()) {
+			sb.append("\"").append(entry.getKey()).append("\":")
+					.append("\"").append(entry.getValue()).append("\",");
+		}
+		if(sb.length() > 1) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 }

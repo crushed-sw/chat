@@ -22,7 +22,7 @@ public class MongodbConfig implements ApplicationListener<ContextRefreshedEvent>
 
 	/**
 	 * 将集合的 _class 去掉
-	 * @param event
+	 * @param event refresh事件
 	 */
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {

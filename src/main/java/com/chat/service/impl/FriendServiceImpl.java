@@ -1,37 +1,55 @@
 package com.chat.service.impl;
 
 import com.chat.entity.*;
+import com.chat.entity.replay.ReplayFriend;
+import com.chat.entity.replay.ReplayWebSocket;
 import com.chat.mapper.FriendRepository;
+import com.chat.mapper.NoticeMapping;
 import com.chat.mapper.UserMapping;
 import com.chat.mapper.UserRepository;
 import com.chat.service.FriendService;
 import com.chat.service.UserService;
-import com.chat.util.CommondUtil;
+import com.chat.util.RedisUtil;
+import com.chat.websocket.WebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class FriendServiceImpl implements FriendService {
+	@Autowired
+	RedisUtil redisUtil;
 	@Autowired
 	FriendRepository friendRepository;
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
 	UserMapping userMapping;
+	@Autowired
+	NoticeMapping noticeMapping;
 
 	@Autowired
 	UserService userService;
 
+	@Autowired
+	WebSocket webSocket;
+
 	@Override
 	public void insertFriend(String userId, String friendId, String groupName, String friendGroupName) {
-		String eachId = CommondUtil.getFriendEachId();
-		CommondUtil.incFriendEachId();
+		String eachId = (String) redisUtil.get("friendEachId");
+		int id = Integer.parseInt(eachId);
+		id++;
+		redisUtil.set("friendEachId", Integer.toString(id));
 		friendRepository.save(new FriendChatRecord(eachId, userId, friendId));
-		//userMapping.appendFriend(userId, groupName, friendId, eachId);
-		//userMapping.appendFriend(friendId, friendGroupName, userId, eachId);
+
+		User user = userService.getUserById(userId);
+		User friend = userService.getUserById(friendId);
+
+		userMapping.appendFriend(userId, groupName, friendId, eachId, friend.getUserName(), friend.getAvatar());
+		userMapping.appendFriend(friendId, friendGroupName, userId, eachId, user.getUserName(), user.getAvatar());
+
+
 	}
 
 	@Override
@@ -63,6 +81,10 @@ public class FriendServiceImpl implements FriendService {
 		friendRepository.deleteById(eachId);
 		userMapping.deleteFriend(userId, groupName, friendId);
 		userMapping.deleteFriend(friendId, friendGroupName, userId);
+
+		ReplayWebSocket replay = new ReplayWebSocket();
+		replay.setStatus(ReplayWebSocket.UPDATE_FRIEND);
+		webSocket.sendRemind(friendId, replay);
 	}
 
 	@Override
@@ -88,23 +110,6 @@ public class FriendServiceImpl implements FriendService {
 		userMapping.appendFriend(userId, newGroupName, friendId, eachId, friendName, avatar);
 	}
 
-	public String getEachId(String userId, String friendId) {
-		User user = userService.getUserById(userId);
-
-		String eachId = "";
-		List<UserInFriend> userGroups = user.getFriendGroups();
-
-		for (UserInFriend userGroup : userGroups) {
-			for (Friend friend : userGroup.getFriends()) {
-				if(friendId.equals(friend.getFriendId())) {
-					eachId = friend.getFriendEachId();
-				}
-			}
-		}
-
-		return eachId;
-	}
-
 	@Override
 	public ReplayFriend getReplayFriend(String userId) {
 		ReplayFriend replay = new ReplayFriend();
@@ -113,8 +118,15 @@ public class FriendServiceImpl implements FriendService {
 	}
 
 	@Override
-	public void insertFriendGroup(String userId, String groupName) {
+	public boolean insertFriendGroup(String userId, String groupName) {
+		for (UserInFriend userInFriend : getFriendsById(userId)) {
+			if(userInFriend.getGroupName().equals(groupName.trim())) {
+				return false;
+			}
+		}
+
 		userMapping.appendFriendGroup(userId, groupName);
+		return true;
 	}
 
 	@Override
@@ -124,8 +136,33 @@ public class FriendServiceImpl implements FriendService {
 		}
 	}
 
+	public boolean addFriend(String userId, String friendId, String groupName) {
+		User friend = userService.getUserById(friendId);
+		if(friend == null) {
+			return false;
+		}
+		User user = userService.getUserById(userId);
+		NoticeMessage message = new NoticeMessage(NoticeMessage.ADD_FRIEND, userId,
+				user.getAvatar(), user.getUserName(), "请求添加好友", groupName, "");
+		noticeMapping.addMessage(friendId, message);
+
+		ReplayWebSocket replay = new ReplayWebSocket();
+		replay.setStatus(ReplayWebSocket.UPDATE_NOTICE);
+		webSocket.sendRemind(friendId, replay);
+
+		return true;
+	}
+
 	@Override
-	public void updateFriendGroup(String userId, String groupName, String newGroupName) {
-		//userMapping.
+	public boolean isFriend(String userId, String friendId) {
+		User user = userService.getUserById(userId);
+		for (UserInFriend friendGroup : user.getFriendGroups()) {
+			for (Friend friend : friendGroup.getFriends()) {
+				if(friend.getFriendId().equals(friendId.trim())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

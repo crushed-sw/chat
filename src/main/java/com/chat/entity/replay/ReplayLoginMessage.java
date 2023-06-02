@@ -1,4 +1,4 @@
-package com.chat.entity;
+package com.chat.entity.replay;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -14,4 +14,6 @@ public class UserInGroup {
 	private String name;
 	private String avatar;
 	private String groupId;
+	private String owner;
+	private Integer number;
 }
