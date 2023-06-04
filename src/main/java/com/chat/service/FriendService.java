@@ -15,4 +15,5 @@ public interface FriendService {
 	void deleteFriendGroup(String userId, String groupName);
 	boolean addFriend(String userId, String friendId, String groupName);
 	boolean isFriend(String userId, String friendId);
+	String getEachId(String userId, String friendId);
 }

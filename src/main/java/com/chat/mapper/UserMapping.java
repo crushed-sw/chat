@@ -1,5 +1,7 @@
 package com.chat.mapper;
 
+import com.chat.entity.User;
+
 public interface UserMapping {
 	void appendGroup(String userId, String groupId);
 	void appendFriendGroup(String userId, String groupName);
@@ -7,5 +9,4 @@ public interface UserMapping {
 	void deleteFriend(String userId, String groupName, String friendId);
 	void deleteFriendGroup(String userId, String groupName);
 	void deleteGroup(String userId, String groupId);
-	void updateFriendGroup(String userId, String groupName, String newGroupName);
 }

@@ -13,9 +13,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Chitchat {
-	private Date date;
-	private String id;
+	private String date;
 	private String avatar;
 	private String name;
+	private String userId;
 	private String chat;
 }

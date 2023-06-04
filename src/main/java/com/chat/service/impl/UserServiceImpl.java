@@ -6,7 +6,9 @@ import com.chat.entity.UserInFriend;
 import com.chat.mapper.UserMapping;
 import com.chat.mapper.UserRepository;
 import com.chat.service.UserService;
+import com.chat.util.CacheUtil;
 import com.chat.util.RedisUtil;
+import net.sf.ehcache.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository repository;
 
-	@Autowired
-	private UserMapping userMapping;
-
-	@Autowired
-	private RedisUtil redisUtil;
-
 	@Override
 	public void insertUser(String userId, String userName, String password) {
 		repository.save(new User(userId, userName, password));
@@ -31,6 +27,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUserById(String userId) {
+		User user = CacheUtil.getUserInCache(userId);
+		return user == null ? getUserByIdInDatabase(userId) : user;
+	}
+
+	private User getUserByIdInDatabase(String userId) {
 		Optional<User> byId = repository.findById(userId);
 		User user = null;
 		if(byId.isPresent()) {
@@ -38,15 +39,4 @@ public class UserServiceImpl implements UserService {
 		}
 		return user;
 	}
-
-	@Override
-	public void deleteById(String userId) {
-		repository.deleteById(userId);
-	}
-
-	@Override
-	public void updateUserById(User user) {
-		repository.save(user);
-	}
-
 }

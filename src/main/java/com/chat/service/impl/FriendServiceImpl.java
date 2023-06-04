@@ -6,7 +6,6 @@ import com.chat.entity.replay.ReplayWebSocket;
 import com.chat.mapper.FriendRepository;
 import com.chat.mapper.NoticeMapping;
 import com.chat.mapper.UserMapping;
-import com.chat.mapper.UserRepository;
 import com.chat.service.FriendService;
 import com.chat.service.UserService;
 import com.chat.util.RedisUtil;
@@ -22,8 +21,6 @@ public class FriendServiceImpl implements FriendService {
 	RedisUtil redisUtil;
 	@Autowired
 	FriendRepository friendRepository;
-	@Autowired
-	UserRepository userRepository;
 	@Autowired
 	UserMapping userMapping;
 	@Autowired
@@ -136,6 +133,7 @@ public class FriendServiceImpl implements FriendService {
 		}
 	}
 
+	@Override
 	public boolean addFriend(String userId, String friendId, String groupName) {
 		User friend = userService.getUserById(friendId);
 		if(friend == null) {
@@ -165,4 +163,22 @@ public class FriendServiceImpl implements FriendService {
 		}
 		return false;
 	}
+
+	@Override
+	public String getEachId(String userId, String friendId) {
+		User friend = userService.getUserById(friendId);
+		assert(friend != null);
+		for (UserInFriend userInFriend : friend.getFriendGroups()) {
+			for (Friend friendUser : userInFriend.getFriends()) {
+				if(friendUser.getFriendId().equals(userId)) {
+					return friendUser.getFriendEachId();
+				}
+			}
+		}
+		return "";
+	}
+
+	//public Integer getFriendCache(String friendId) {
+	//	Integer
+	//}
 }

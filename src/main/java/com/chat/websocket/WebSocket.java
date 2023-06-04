@@ -1,14 +1,14 @@
 package com.chat.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.chat.entity.*;
-import com.chat.entity.recive.WebSocketMessage;
-import com.chat.entity.replay.ReplayGroup;
+import com.chat.entity.Friend;
+import com.chat.entity.GroupChatRecord;
+import com.chat.entity.User;
+import com.chat.entity.UserInGroup;
 import com.chat.entity.replay.ReplayWebSocket;
 import com.chat.mapper.FriendRepository;
 import com.chat.mapper.GroupRepository;
-import com.chat.mapper.UserRepository;
-import com.chat.service.GroupService;
+import com.chat.service.UserService;
 import com.chat.util.RedisUtil;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -28,13 +27,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/chat/ws/{userId}")
 public class WebSocket {
 	@Autowired
-	RedisUtil redisUtil;
-	@Autowired
 	GroupRepository groupRepository;
 	@Autowired
 	FriendRepository friendRepository;
+
 	@Autowired
-	UserRepository userRepository;
+	UserService userService;
+
+	@Autowired
+	RedisUtil redisUtil;
 
 	private Session session;
 	private String userId;
@@ -76,25 +77,7 @@ public class WebSocket {
 
 	@OnMessage
 	public void OnMessage(String message) {
-		WebSocketMessage webSocketMessage = JSON.parseObject(message, WebSocketMessage.class);
-		Integer status = webSocketMessage.getStatus();
-		String fromId = webSocketMessage.getFromId();
-		String toId = webSocketMessage.getToId();
-		String chat = webSocketMessage.getMessage();
 
-		if(status.equals(WebSocketMessage.SEND_TO_USER)) {
-			User user = userRepository.findById(fromId).get();
-			ReplayWebSocket replay = new ReplayWebSocket(ReplayWebSocket.SEND_TO_USER,
-					user.getUserId(), user.getAvatar(), user.getUserName(), chat);
-			sendUserMessage(toId, replay);
-		} else if(status.equals(WebSocketMessage.SEND_TO_GROUP)) {
-			GroupChatRecord group = groupRepository.findById(fromId).get();
-			ReplayWebSocket replay = new ReplayWebSocket(ReplayWebSocket.SEND_TO_GROUP,
-					group.getGroupId(), group.getAvatar(), group.getName(), chat);
-			sendUserMessage(toId, replay);
-		} else {
-
-		}
 	}
 
 	@OnError
@@ -108,9 +91,9 @@ public class WebSocket {
 	 * @param groupId
 	 * @param replay
 	 */
-	public void sendGroupMessage(String groupId, ReplayWebSocket replay) {
+	public void sendGroupMessage(String groupId, String sender, ReplayWebSocket replay) {
 		String groupKey = "group-" + groupId;
-		String sender = replay.getId();
+
 		GroupChatRecord group = groupRepository.findById(groupId).get();
 
 		List<String> crews = group.getCrew();
@@ -140,7 +123,7 @@ public class WebSocket {
 			if(sessionObject != null && sessionObject.isOpen()) {
 				try {
 					log.info("[websocket] " + userId + " 发送消息");
-					sessionObject.getAsyncRemote().sendText(replay.getJson());
+					sessionObject.getAsyncRemote().sendText(JSON.toJSONString(replay));
 				} catch (Exception e) {
 					log.error("[websocket] 发送错误");
 					e.printStackTrace();
@@ -169,7 +152,7 @@ public class WebSocket {
 			map.put(keyFriend, JSON.toJSONString(friend));
 			redisUtil.add(key, map);
 		} else {
-			User user = userRepository.findById(friendId).get();
+			User user = userService.getUserById(friendId);
 			Friend friend = new Friend(user.getAvatar(), friendId, user.getUserName(),
 					"", 1);
 			map.put(keyFriend, JSON.toJSONString(friend));
@@ -179,7 +162,7 @@ public class WebSocket {
 		if(sessionObject != null && sessionObject.isOpen()) {
 			try {
 				log.info("[websocket] " + userId + " 发送消息");
-				sessionObject.getAsyncRemote().sendText(replay.getJson());
+				sessionObject.getAsyncRemote().sendText(JSON.toJSONString(replay));
 			} catch (Exception e) {
 				log.error("[websocket] 发送错误");
 				e.printStackTrace();
@@ -207,7 +190,7 @@ public class WebSocket {
 		if(sessionObject != null && sessionObject.isOpen()) {
 			try {
 				log.info("[websocket] " + userId + " 发送提示");
-				sessionObject.getAsyncRemote().sendText(replay.getJson());
+				sessionObject.getAsyncRemote().sendText(JSON.toJSONString(replay));
 			} catch (Exception e) {
 				log.error("[websocket] 发送错误");
 				e.printStackTrace();

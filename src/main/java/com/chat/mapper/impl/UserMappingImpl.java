@@ -1,13 +1,21 @@
 package com.chat.mapper.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.chat.entity.User;
 import com.chat.mapper.UserMapping;
 import com.chat.util.MongoUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import org.bson.BSONObject;
+import org.bson.BsonDocument;
+import org.bson.BsonValue;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 @Repository
 public class UserMappingImpl implements UserMapping {
@@ -91,21 +99,4 @@ public class UserMappingImpl implements UserMapping {
 
 		users.updateOne(new BasicDBObject("_id", userId), userObject);
 	}
-
-	@Override
-	public void updateFriendGroup(String userId, String groupName, String newGroupName) {
-		MongoCollection<Document> users = MongoUtil.getDatabase("user");
-		BasicDBObject queryObject = new BasicDBObject();
-		queryObject.put("_id", userId);
-		queryObject.put("friendGroups.groupName", groupName);
-
-		BasicDBObject friendGroupObject = new BasicDBObject();
-		friendGroupObject.put("friendGroups.$.groupName", newGroupName);
-
-		BasicDBObject userObject = new BasicDBObject();
-		userObject.put("$set", friendGroupObject);
-
-		users.updateOne(queryObject, userObject);
-	}
-
 }

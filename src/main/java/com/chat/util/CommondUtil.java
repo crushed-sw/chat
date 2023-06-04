@@ -118,8 +118,12 @@ public class CommondUtil {
 	public static String mapToJson(Map<Object, Object> map) {
 		StringBuilder sb = new StringBuilder("{");
 		for (Map.Entry<Object, Object> entry : map.entrySet()) {
-			sb.append("\"").append(entry.getKey()).append("\":")
-					.append("\"").append(entry.getValue()).append("\",");
+			sb.append("\"").append(entry.getKey()).append("\":");
+			if(entry.getKey().equals("notice")) {
+				sb.append("\"").append(entry.getValue()).append("\",");
+			} else {
+				sb.append(entry.getValue()).append(",");
+			}
 		}
 		if(sb.length() > 1) {
 			sb.deleteCharAt(sb.length() - 1);

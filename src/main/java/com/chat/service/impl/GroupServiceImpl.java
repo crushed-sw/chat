@@ -24,8 +24,6 @@ public class GroupServiceImpl implements GroupService {
 	@Autowired
 	RedisUtil redisUtil;
 	@Autowired
-	UserRepository userRepository;
-	@Autowired
 	UserMapping userMapping;
 	@Autowired
 	GroupMapping groupMapping;
