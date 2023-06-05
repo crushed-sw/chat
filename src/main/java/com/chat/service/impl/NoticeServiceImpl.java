@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * 通知逻辑类
+ */
 @Service
 public class NoticeServiceImpl implements NoticeService {
 	@Autowired
@@ -34,6 +37,11 @@ public class NoticeServiceImpl implements NoticeService {
 	@Autowired
 	WebSocket webSocket;
 
+	/**
+	 * 获取通知实体类
+	 * @param userId 用户ID
+	 * @return 实体类
+	 */
 	@Override
 	public Notice getNoticeById(String userId) {
 		Optional<Notice> byId = noticeRepository.findById(userId);
@@ -44,6 +52,11 @@ public class NoticeServiceImpl implements NoticeService {
 		return notice;
 	}
 
+	/**
+	 * 获取通知
+	 * @param userId 用户ID
+	 * @return 通知列表
+	 */
 	@Override
 	public ReplayNotice getReplayNotice(String userId) {
 		ReplayNotice replay = new ReplayNotice();
@@ -52,6 +65,14 @@ public class NoticeServiceImpl implements NoticeService {
 		return replay;
 	}
 
+	/**
+	 * 请求好友通知同意
+	 * @param userId 用户ID
+	 * @param oppositeId 对方用户ID
+	 * @param status 状态码
+	 * @param groupName 好友分组
+	 * @param oppositeGroupName 对方用户好友分组
+	 */
 	@Override
 	public void addFriend(String userId, String oppositeId, Integer status, String groupName, String oppositeGroupName) {
 		noticeMapping.updateMessage(userId, oppositeId, status, NoticeMessage.MESSAGE_ADDED);
@@ -69,6 +90,12 @@ public class NoticeServiceImpl implements NoticeService {
 		webSocket.sendRemind(oppositeId, replay);
 	}
 
+	/**
+	 * 请求添加群聊通知同意
+	 * @param userId 用户ID
+	 * @param oppositeId 群聊ID
+	 * @param status 状态码
+	 */
 	@Override
 	public void addGroup(String userId, String oppositeId, Integer status) {
 		GroupChatRecord group = groupService.getGroupRecordById(oppositeId);
@@ -86,6 +113,12 @@ public class NoticeServiceImpl implements NoticeService {
 		webSocket.sendRemind(userId, replay);
 	}
 
+	/**
+	 * 请求好友通知拒绝
+	 * @param userId 用户ID
+	 * @param oppositeId 对方用户ID
+	 * @param status 状态码
+	 */
 	@Override
 	public void refuseFriend(String userId, String oppositeId, Integer status) {
 		noticeMapping.updateMessage(userId, oppositeId, status, NoticeMessage.MESSAGE_REJECTED);
@@ -100,6 +133,12 @@ public class NoticeServiceImpl implements NoticeService {
 		webSocket.sendRemind(oppositeId, replay);
 	}
 
+	/**
+	 * 请求添加群聊通知拒绝
+	 * @param userId 用户ID
+	 * @param oppositeId 群聊ID
+	 * @param status 状态码
+	 */
 	@Override
 	public void refuseGroup(String userId, String oppositeId, Integer status) {
 		GroupChatRecord group = groupService.getGroupRecordById(oppositeId);

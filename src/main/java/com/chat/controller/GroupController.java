@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 有关群组的请求
+ */
 @Slf4j
 @RestController
 @RequestMapping("/chat/group")
@@ -16,6 +19,10 @@ public class GroupController {
 	@Autowired
 	GroupService groupService;
 
+	/**
+	 * 获取群聊信息
+	 * @return 返回所有群聊信息
+	 */
 	@UserLoginToken
 	@GetMapping
 	public ReplayGroup getGroups(HttpServletRequest req) {
@@ -24,6 +31,11 @@ public class GroupController {
 		return groupService.getReplayGroup(userId);
 	}
 
+	/**
+	 * 添加群聊
+	 * @param groupMessageJson 添加群聊的用户和群聊ID
+	 * @return 返回更新后的群聊信息
+	 */
 	@UserLoginToken
 	@PostMapping
 	public ReplayGroup insertGroup(@RequestBody GroupMessageJson groupMessageJson) {
@@ -54,6 +66,11 @@ public class GroupController {
 		return replay;
 	}
 
+	/**
+	 * 删除群聊
+	 * @param groupMessageJson 删除群聊的用户和群聊ID
+	 * @return 返回更新后的群聊信息
+	 */
 	@UserLoginToken
 	@DeleteMapping
 	public ReplayGroup deleteGroup(@RequestBody GroupMessageJson groupMessageJson) {
@@ -64,6 +81,11 @@ public class GroupController {
 		return groupService.getReplayGroup(userId);
 	}
 
+	/**
+	 * 创建群聊
+	 * @param groupMessageJson 创建群聊的用户和群聊名
+	 * @return 返回更新后的群聊信息
+	 */
 	@UserLoginToken
 	@PostMapping("/create")
 	public ReplayGroup createGroup(@RequestBody GroupMessageJson groupMessageJson) {

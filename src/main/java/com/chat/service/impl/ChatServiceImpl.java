@@ -8,7 +8,10 @@ import com.chat.entity.User;
 import com.chat.entity.recive.WebSocketMessage;
 import com.chat.entity.replay.ReplayChat;
 import com.chat.entity.replay.ReplayWebSocket;
-import com.chat.mapper.*;
+import com.chat.mapper.FriendMapping;
+import com.chat.mapper.FriendRepository;
+import com.chat.mapper.GroupMapping;
+import com.chat.mapper.GroupRepository;
 import com.chat.service.ChatService;
 import com.chat.service.FriendService;
 import com.chat.service.GroupService;
@@ -18,8 +21,12 @@ import com.chat.websocket.WebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * 聊天相关逻辑实现
+ */
 @Service
 public class ChatServiceImpl implements ChatService {
 	@Autowired
@@ -43,6 +50,13 @@ public class ChatServiceImpl implements ChatService {
 	@Autowired
 	RedisUtil redisUtil;
 
+	/**
+	 * 发送消息给用户
+	 * @param message 前端传的JSON
+	 *        fromId 当前用户ID
+	 *        toId 好友ID
+	 *        chat 聊天内容
+	 */
 	@Override
 	public void sendToUser(WebSocketMessage message) {
 		String fromId = message.getFromId();
@@ -55,29 +69,41 @@ public class ChatServiceImpl implements ChatService {
 		webSocket.sendUserMessage(toId, replay);
 
 		String eachId = friendService.getEachId(fromId, toId);
-		System.out.println(eachId);
 		friendMapping.appendRecord(eachId, user, chat, message.getDate());
 
 		clearFriendRedis(message);
 	}
 
+	/**
+	 * 发送消息给群聊
+	 * @param message 前端传的JSON
+	 *        fromId 当前用户ID
+	 *        toId 群聊ID
+	 *        chat 聊天内容
+	 */
 	@Override
 	public void sendToGroup(WebSocketMessage message) {
 		String fromId = message.getFromId();
 		String toId = message.getToId();
 		String chat = message.getMessage();
 
+		User user = userService.getUserById(fromId);
 		GroupChatRecord group = groupRepository.findById(toId).get();
 		ReplayWebSocket replay = new ReplayWebSocket(ReplayWebSocket.SEND_TO_GROUP,
-				group.getGroupId(), group.getAvatar(), group.getName(), chat, message.getDate());
+				group.getGroupId(), user.getAvatar(), user.getUserName(), chat, message.getDate());
 		webSocket.sendGroupMessage(toId, fromId, replay);
 
-		User user = userService.getUserById(fromId);
 		groupMapping.appendRecord(toId, user, chat, message.getDate());
 
 		clearGroupRedis(message);
 	}
 
+	/**
+	 * 清除好友的未读缓存
+	 * @param message 前端传的JSON
+	 *        fromId 当前用户ID
+	 *        toId 好友ID
+	 */
 	@Override
 	public void clearFriendRedis(WebSocketMessage message) {
 		String key = "chat-" + message.getFromId();
@@ -85,6 +111,12 @@ public class ChatServiceImpl implements ChatService {
 		redisUtil.delete(key, friendKey);
 	}
 
+	/**
+	 * 清除群聊的未读缓存
+	 * @param message 前端传的JSON
+	 *        fromId 当前用户ID
+	 *        toId 群聊ID
+	 */
 	@Override
 	public void clearGroupRedis(WebSocketMessage message) {
 		String key = "chat-" + message.getFromId();
@@ -92,6 +124,11 @@ public class ChatServiceImpl implements ChatService {
 		redisUtil.delete(key, friendKey);
 	}
 
+	/**
+	 * 获取好友聊天记录(下载)
+	 * @param message
+	 * @return
+	 */
 	@Override
 	public String getFriendRecord(WebSocketMessage message) {
 		String fromId = message.getFromId();
@@ -103,11 +140,17 @@ public class ChatServiceImpl implements ChatService {
 		StringBuilder sb = new StringBuilder();
 		for (Chitchat chitchat : friendChatRecord.getRecord()) {
 			sb.append(chitchat.getUserId()).append("(").append(chitchat.getName()).append(")-")
-					.append(chitchat.getDate()).append("-").append(chitchat.getChat()).append("\n");
+					.append(chitchat.getDate()).append("-").append(chitchat.getChat()).append("<br/>");
 		}
+
 		return sb.toString();
 	}
 
+	/**
+	 * 获取群聊聊天记录(下载)
+	 * @param message
+	 * @return
+	 */
 	@Override
 	public String getGroupRecord(WebSocketMessage message) {
 		String groupId = message.getFromId();
@@ -116,11 +159,17 @@ public class ChatServiceImpl implements ChatService {
 		StringBuilder sb = new StringBuilder();
 		for (Chitchat chitchat : groupChatRecord.getRecord()) {
 			sb.append(chitchat.getUserId()).append("(").append(chitchat.getName()).append(")-")
-					.append(chitchat.getDate()).append("-").append(chitchat.getChat()).append("\n");
+					.append(chitchat.getDate()).append("-").append(chitchat.getChat()).append("<br/>");
 		}
+
 		return sb.toString();
 	}
 
+	/**
+	 * 获取好友聊天记录
+	 * @param message
+	 * @return
+	 */
 	@Override
 	public String getNumberOfFriendRecord(WebSocketMessage message) {
 		String fromId = message.getFromId();
@@ -143,21 +192,27 @@ public class ChatServiceImpl implements ChatService {
 		ReplayChat replay = new ReplayChat();
 		replay.setChatRecords(record);
 
+		clearFriendRedis(message);
 		return JSON.toJSONString(replay);
 	}
 
+	/**
+	 * 获取群聊聊天记录
+	 * @param message
+	 * @return
+	 */
 	@Override
 	public String getNumberOfGroupRecord(WebSocketMessage message) {
-		String fromId = message.getToId();
+		String groupId = message.getToId();
 		int pageStart = message.getNumber();
 
-		int allSize = groupMapping.getSizeOfRecord(fromId);
+		int allSize = groupMapping.getSizeOfRecord(groupId);
 		int start = Math.max(allSize - pageStart - 10, 0);
 		int number = Math.min(allSize - pageStart, 10);
 
 		List<Chitchat> record;
 		try {
-			record = groupMapping.getRecord(fromId, start, number).getRecord();
+			record = groupMapping.getRecord(groupId, start, number).getRecord();
 		} catch (Exception e) {
 			record = new ArrayList<>();
 		}
@@ -165,6 +220,7 @@ public class ChatServiceImpl implements ChatService {
 		ReplayChat replay = new ReplayChat();
 		replay.setChatRecords(record);
 
+		clearGroupRedis(message);
 		return JSON.toJSONString(replay);
 	}
 }

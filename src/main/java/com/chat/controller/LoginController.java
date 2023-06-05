@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 关于登陆的请求
+ */
 @RequestMapping("/login")
 @RestController
 @Slf4j

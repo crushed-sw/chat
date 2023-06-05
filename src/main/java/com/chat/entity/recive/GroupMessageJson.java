@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 群聊请求的JSON实体类
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

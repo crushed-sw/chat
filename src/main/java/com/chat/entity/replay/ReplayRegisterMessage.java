@@ -3,6 +3,9 @@ package com.chat.entity.replay;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * 登陆注册反馈实体类
+ */
 @Data
 @AllArgsConstructor
 public class ReplayRegisterMessage {

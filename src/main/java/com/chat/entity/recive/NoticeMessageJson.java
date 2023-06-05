@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 与通知（同意或拒绝）相关实体类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

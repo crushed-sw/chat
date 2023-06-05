@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * websocket主动通知的JSON实体类
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

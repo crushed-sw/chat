@@ -32,6 +32,13 @@ public class FriendServiceImpl implements FriendService {
 	@Autowired
 	WebSocket webSocket;
 
+	/**
+	 * 添加好友
+	 * @param userId 用户ID
+	 * @param friendId 好友ID
+	 * @param groupName 好友分组
+	 * @param friendGroupName 好友的好友分组
+	 */
 	@Override
 	public void insertFriend(String userId, String friendId, String groupName, String friendGroupName) {
 		String eachId = (String) redisUtil.get("friendEachId");
@@ -49,6 +56,11 @@ public class FriendServiceImpl implements FriendService {
 
 	}
 
+	/**
+	 * 获取好友列表
+	 * @param userId 用户ID
+	 * @return 好友列表
+	 */
 	@Override
 	public List<UserInFriend> getFriendsById(String userId) {
 		User user = userService.getUserById(userId);
@@ -57,6 +69,12 @@ public class FriendServiceImpl implements FriendService {
 		return user.getFriendGroups();
 	}
 
+	/**
+	 * 删除好友
+	 * @param userId 用户ID
+	 * @param groupName 好友分组
+	 * @param friendId 好友ID
+	 */
 	@Override
 	public void deleteFriendById(String userId, String groupName, String friendId) {
 		User friend = userService.getUserById(friendId);
@@ -68,7 +86,7 @@ public class FriendServiceImpl implements FriendService {
 
 		for (UserInFriend friendGroup : friendGroups) {
 			for (Friend friendFriend : friendGroup.getFriends()) {
-				if(userId.equals(friendFriend.getFriendId())) {
+				if (userId.equals(friendFriend.getFriendId())) {
 					eachId = friendFriend.getFriendEachId();
 					friendGroupName = friendGroup.getGroupName();
 				}
@@ -84,6 +102,13 @@ public class FriendServiceImpl implements FriendService {
 		webSocket.sendRemind(friendId, replay);
 	}
 
+	/**
+	 * 将好友更换好友分组
+	 * @param userId 用户ID
+	 * @param oldGroupName 旧好友分组
+	 * @param newGroupName 新好友分许
+	 * @param friendId 好友ID
+	 */
 	@Override
 	public void updateFriendById(String userId, String oldGroupName, String newGroupName, String friendId) {
 		User user = userService.getUserById(userId);
@@ -95,7 +120,7 @@ public class FriendServiceImpl implements FriendService {
 
 		for (UserInFriend userGroup : userGroups) {
 			for (Friend friend : userGroup.getFriends()) {
-				if(friendId.equals(friend.getFriendId())) {
+				if (friendId.equals(friend.getFriendId())) {
 					eachId = friend.getFriendEachId();
 					avatar = friend.getAvatar();
 					friendName = friend.getFriendName();
@@ -107,6 +132,11 @@ public class FriendServiceImpl implements FriendService {
 		userMapping.appendFriend(userId, newGroupName, friendId, eachId, friendName, avatar);
 	}
 
+	/**
+	 * 获取好友列表
+	 * @param userId 用户ID
+	 * @return 好友列表
+	 */
 	@Override
 	public ReplayFriend getReplayFriend(String userId) {
 		ReplayFriend replay = new ReplayFriend();
@@ -114,10 +144,16 @@ public class FriendServiceImpl implements FriendService {
 		return replay;
 	}
 
+	/**
+	 * 添加好友分组
+	 * @param userId 用户ID
+	 * @param groupName 好友分组
+	 * @return 是否成功
+	 */
 	@Override
 	public boolean insertFriendGroup(String userId, String groupName) {
 		for (UserInFriend userInFriend : getFriendsById(userId)) {
-			if(userInFriend.getGroupName().equals(groupName.trim())) {
+			if (userInFriend.getGroupName().equals(groupName.trim())) {
 				return false;
 			}
 		}
@@ -126,17 +162,29 @@ public class FriendServiceImpl implements FriendService {
 		return true;
 	}
 
+	/**
+	 * 删除好友分组
+	 * @param userId 用户ID
+	 * @param groupName 好友分组
+	 */
 	@Override
 	public void deleteFriendGroup(String userId, String groupName) {
-		if(!"我的好友".equals(groupName.trim())) {
+		if (!"我的好友".equals(groupName.trim())) {
 			userMapping.deleteFriendGroup(userId, groupName);
 		}
 	}
 
+	/**
+	 * 申请添加好友
+	 * @param userId 用户ID
+	 * @param friendId 好友ID
+	 * @param groupName 好友分组
+	 * @return 是否成功
+	 */
 	@Override
 	public boolean addFriend(String userId, String friendId, String groupName) {
 		User friend = userService.getUserById(friendId);
-		if(friend == null) {
+		if (friend == null) {
 			return false;
 		}
 		User user = userService.getUserById(userId);
@@ -151,12 +199,18 @@ public class FriendServiceImpl implements FriendService {
 		return true;
 	}
 
+	/**
+	 * 判断俩用户之间是不是好友
+	 * @param userId 用户ID
+	 * @param friendId 好友ID
+	 * @return 返回
+	 */
 	@Override
 	public boolean isFriend(String userId, String friendId) {
 		User user = userService.getUserById(userId);
 		for (UserInFriend friendGroup : user.getFriendGroups()) {
 			for (Friend friend : friendGroup.getFriends()) {
-				if(friend.getFriendId().equals(friendId.trim())) {
+				if (friend.getFriendId().equals(friendId.trim())) {
 					return true;
 				}
 			}
@@ -164,21 +218,23 @@ public class FriendServiceImpl implements FriendService {
 		return false;
 	}
 
+	/**
+	 * 获取两个好友间的聊天ID
+	 * @param userId 用户ID
+	 * @param friendId 好友ID
+	 * @return 返回聊天ID
+	 */
 	@Override
 	public String getEachId(String userId, String friendId) {
 		User friend = userService.getUserById(friendId);
-		assert(friend != null);
+		assert (friend != null);
 		for (UserInFriend userInFriend : friend.getFriendGroups()) {
 			for (Friend friendUser : userInFriend.getFriends()) {
-				if(friendUser.getFriendId().equals(userId)) {
+				if (friendUser.getFriendId().equals(userId)) {
 					return friendUser.getFriendEachId();
 				}
 			}
 		}
 		return "";
 	}
-
-	//public Integer getFriendCache(String friendId) {
-	//	Integer
-	//}
 }

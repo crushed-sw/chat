@@ -13,11 +13,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * notice数据库crud
+ */
 @Repository
 public class NoticeMappingImpl implements NoticeMapping {
 	@Autowired
 	NoticeRepository noticeRepository;
 
+	/**
+	 * 添加通知消息
+	 * @param userId 用户ID
+	 * @param message 添加的通知内容
+	 */
 	@Override
 	public void addMessage(String userId, NoticeMessage message) {
 		MongoCollection<Document> notice = MongoUtil.getDatabase("notice");
@@ -36,6 +44,13 @@ public class NoticeMappingImpl implements NoticeMapping {
 		notice.updateOne(new BasicDBObject("_id", userId), userObject);
 	}
 
+	/**
+	 * 更改通知消息
+	 * @param userId 用户ID
+	 * @param fromId 操作的消息所指对象
+	 * @param status 需要更改的状态
+	 * @param newStatus 需要更改为的状态
+	 */
 	@Override
 	public void updateMessage(String userId, String fromId, Integer status, Integer newStatus) {
 		Optional<Notice> byId = noticeRepository.findById(userId);

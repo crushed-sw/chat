@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 群聊逻辑类
+ */
 @Service
 public class GroupServiceImpl implements GroupService {
 	@Autowired
@@ -38,23 +41,37 @@ public class GroupServiceImpl implements GroupService {
 	@Autowired
 	WebSocket webSocket;
 
-
+	/**
+	 * 添加群聊
+	 * @param userId 用户ID
+	 * @param groupId 群聊ID
+	 */
 	@Override
 	public void insertGroup(String userId, String groupId) {
 		userMapping.appendGroup(userId, groupId);
 		groupMapping.appendCrew(groupId, userId);
 	}
 
+	/**
+	 * 创建群聊
+	 * @param userId 用户ID
+	 * @param groupName 群聊名称
+	 */
 	@Override
 	public void createGroup(String userId, String groupName) {
 		String groupId = (String) redisUtil.get("groupId");
 		int id = Integer.parseInt(groupId);
 		id++;
 		redisUtil.set("groupId", Integer.toString(id));
-		groupRepository.save(new GroupChatRecord(groupId, userId, CommondUtil.getAvatar(), groupName, new ArrayList<>(), new ArrayList<>()));
+		groupRepository.save(new GroupChatRecord(groupId, userId, CommondUtil.getGroupAvatar(), groupName, new ArrayList<>(), new ArrayList<>()));
 		userMapping.appendGroup(userId, groupId);
 	}
 
+	/**
+	 * 获取群聊列表
+	 * @param userId 用户ID
+	 * @return 群聊列表
+	 */
 	@Override
 	public List<UserInGroup> getgroupsById(String userId) {
 		User user = userService.getUserById(userId);
@@ -77,6 +94,11 @@ public class GroupServiceImpl implements GroupService {
 		return replay;
 	}
 
+	/**
+	 * 删除群聊
+	 * @param userId 用户ID
+	 * @param groupId 群聊ID
+	 */
 	@Override
 	public void deleteGroupById(String userId, String groupId) {
 		GroupChatRecord groupRecordById = getGroupRecordById(groupId);
@@ -97,6 +119,10 @@ public class GroupServiceImpl implements GroupService {
 		}
 	}
 
+	/**
+	 * 群主解散群聊
+	 * @param groupId 群聊ID
+	 */
 	public void destroyGroup(String groupId) {
 		GroupChatRecord groupRecord = getGroupRecordById(groupId);
 		List<String> crews = groupRecord.getCrew();
@@ -118,6 +144,11 @@ public class GroupServiceImpl implements GroupService {
 		groupRepository.deleteById(groupId);
 	}
 
+	/**
+	 * 获取群聊聊天记录
+	 * @param groupId 群聊ID
+	 * @return 聊天记录
+	 */
 	@Override
 	public GroupChatRecord getGroupRecordById(String groupId) {
 		Optional<GroupChatRecord> byId = groupRepository.findById(groupId);
@@ -128,6 +159,11 @@ public class GroupServiceImpl implements GroupService {
 		return groupChat;
 	}
 
+	/**
+	 * 获取群聊列表
+	 * @param userId 用户ID
+	 * @return 群聊列表
+	 */
 	@Override
 	public ReplayGroup getReplayGroup(String userId) {
 		ReplayGroup replay = new ReplayGroup();
@@ -135,6 +171,12 @@ public class GroupServiceImpl implements GroupService {
 		return replay;
 	}
 
+	/**
+	 * 请求添加群聊
+	 * @param userId 用户ID
+	 * @param groupId 群聊ID
+	 * @return 是否成功
+	 */
 	@Override
 	public boolean addGroup(String userId, String groupId) {
 		GroupChatRecord groupRecordById = getGroupRecordById(groupId);
@@ -153,6 +195,12 @@ public class GroupServiceImpl implements GroupService {
 		return true;
 	}
 
+	/**
+	 * 判断该用户是否是群聊成员
+	 * @param userId 用户ID
+	 * @param groupId 群聊ID
+	 * @return 是否是群聊成员
+	 */
 	@Override
 	public int isInGroup(String userId, String groupId) {
 		GroupChatRecord group = getGroupRecordById(groupId);

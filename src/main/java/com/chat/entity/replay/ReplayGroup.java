@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 反馈group请求类
+ * 反馈group请求实体类
  */
 @Data
 @AllArgsConstructor

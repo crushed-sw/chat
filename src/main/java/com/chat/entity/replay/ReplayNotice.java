@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 返回通知的JSON实体类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

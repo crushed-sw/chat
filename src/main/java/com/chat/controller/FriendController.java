@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- *
+ * 好友界面的请求
  */
 @Slf4j
 @RestController
@@ -19,6 +19,10 @@ public class FriendController {
 	@Autowired
 	FriendService friendService;
 
+	/**
+	 * 请求好友列表
+	 * @return 返回好友列表信息
+	 */
 	@UserLoginToken
 	@GetMapping
 	public ReplayFriend getFriends(HttpServletRequest req) {
@@ -27,6 +31,11 @@ public class FriendController {
 		return friendService.getReplayFriend(userId);
 	}
 
+	/**
+	 * 添加好友
+	 * @param message 前端发送的JSON
+	 * @return 返回更新过的好友列表
+	 */
 	@UserLoginToken
 	@PostMapping
 	public ReplayFriend insertFriend(@RequestBody FriendMessageJson message) {
@@ -50,6 +59,11 @@ public class FriendController {
 		return replay;
 	}
 
+	/**
+	 * 删除好友
+	 * @param message 需要删除的信息JSON
+	 * @return 返回更新过的好友列表
+	 */
 	@UserLoginToken
 	@DeleteMapping
 	public ReplayFriend deleteFriend(@RequestBody FriendMessageJson message) {
@@ -58,6 +72,11 @@ public class FriendController {
 		return friendService.getReplayFriend(message.getUserId());
 	}
 
+	/**
+	 * 好友移动分组
+	 * @param messageJson 需要移动的信息JSON
+	 * @return 返回更新过的好友列表
+	 */
 	@UserLoginToken
 	@PutMapping
 	public ReplayFriend updateFriend(@RequestBody FriendMessageJson messageJson) {

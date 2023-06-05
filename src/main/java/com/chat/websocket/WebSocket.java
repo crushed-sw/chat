@@ -43,6 +43,11 @@ public class WebSocket {
 	private static ConcurrentHashMap<String, WebSocket> webSockets = new ConcurrentHashMap<>();
 	private static ConcurrentHashMap<String, Session> sessionPool = new ConcurrentHashMap<>();
 
+	/**
+	 * 连接websocket时初始化和添加至session池里
+	 * @param session
+	 * @param userId
+	 */
 	@OnOpen
 	public void onOpen(Session session, @PathParam("userId") String userId) {
 		try {
@@ -63,6 +68,9 @@ public class WebSocket {
 		}
 	}
 
+	/**
+	 * websocket 关闭时处理
+	 */
 	@OnClose
 	public void OnClose() {
 		try {
@@ -80,6 +88,11 @@ public class WebSocket {
 
 	}
 
+	/**
+	 * 错误时异常处理
+	 * @param session
+	 * @param error
+	 */
 	@OnError
 	public void onError(Session session, Throwable error) {
 		log.error("[websocket] " + userId + " 错误, 原因：" + error.getMessage());
@@ -122,7 +135,7 @@ public class WebSocket {
 
 			if(sessionObject != null && sessionObject.isOpen()) {
 				try {
-					log.info("[websocket] " + userId + " 发送消息");
+					log.info("[websocket] " + sender + " 发送消息");
 					sessionObject.getAsyncRemote().sendText(JSON.toJSONString(replay));
 				} catch (Exception e) {
 					log.error("[websocket] 发送错误");
@@ -170,6 +183,11 @@ public class WebSocket {
 		}
 	}
 
+	/**
+	 * 发送提示消息
+	 * @param userId
+	 * @param replay
+	 */
 	public void sendRemind(String userId, ReplayWebSocket replay) {
 		String key = "chat-" + userId;
 		Session sessionObject = sessionPool.get(userId);

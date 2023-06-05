@@ -6,6 +6,7 @@ import com.chat.service.ChatService;
 import com.chat.util.CommondUtil;
 import com.chat.util.RedisUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+/**
+ * 聊天界面的请求
+ */
+@Slf4j
 @RestController
 @RequestMapping("/chat")
 public class ChatController {
@@ -34,44 +39,64 @@ public class ChatController {
 	public String doFresh(HttpServletRequest req) {
 		String userId = (String) req.getAttribute("userId");
 		Map<Object, Object> hashEntries = redisUtil.getHashEntries("chat-" + userId);
+		log.info("[servlet] " + userId + " 请求未读信息");
 		return CommondUtil.mapToJson(hashEntries);
 	}
 
+	/**
+	 * 聊天界面的请求
+	 * @param message 前端请求JSON
+	 * @return 返回的聊天消息
+	 */
 	@UserLoginToken
 	@PostMapping
 	public String chatEachOther(@RequestBody WebSocketMessage message) {
 		Integer status = message.getStatus();
-
-		System.out.println(message);
+		String userId = message.getFromId();
+		String toId = message.getToId();
 
 		switch (status) {
-			case WebSocketMessage.SEND_TO_USER ->
+			case WebSocketMessage.SEND_TO_USER -> {
 				chatService.sendToUser(message);
-			case WebSocketMessage.SEND_TO_GROUP ->
+				log.info("[servlet] " + userId + " 发送给好友 " + toId + " 信息");
+			}
+			case WebSocketMessage.SEND_TO_GROUP -> {
 				chatService.sendToGroup(message);
+				log.info("[servlet] " + userId + " 发送给群聊 " + toId + " 信息");
+			}
 			case WebSocketMessage.GET_FRIEND_RECORD -> {
+				log.info("[servlet] " + userId + " 获取与好友 " + toId + " 聊天记录");
 				return chatService.getNumberOfFriendRecord(message);
 			}
 			case WebSocketMessage.GET_GROUP_RECORD -> {
+				log.info("[servlet] " + userId + " 获取与群聊 " + toId + " 聊天记录");
 				return chatService.getNumberOfGroupRecord(message);
 			}
 		}
 		return "{}";
 	}
 
+	/**
+	 * 用于下载聊天记录
+	 * @param message 前端请求JSON
+	 * @return 返回的聊天记录文件
+	 */
 	@UserLoginToken
 	@PostMapping("/download")
 	public ResponseEntity<ByteArrayResource> chatDownload(@RequestBody WebSocketMessage message) throws Exception {
-		String fromId = message.getFromId();
+		String userId = message.getFromId();
+		String toId = message.getToId();
 		String content = "";
 
-		if(message.getStatus().equals(WebSocketMessage.SEND_TO_USER)) {
+		if(message.getStatus().equals(WebSocketMessage.GET_FRIEND_RECORD)) {
 			content = chatService.getFriendRecord(message);
-		} else if (message.getStatus().equals(WebSocketMessage.SEND_TO_GROUP)) {
+			log.info("[servlet] " + userId + " 下载与好友 " + toId + " 聊天记录");
+		} else if (message.getStatus().equals(WebSocketMessage.GET_GROUP_RECORD)) {
 			content = chatService.getGroupRecord(message);
+			log.info("[servlet] " + userId + " 下载与群聊 " + toId + " 聊天记录");
 		}
 
-		Path tempFile = Files.createTempFile(fromId + "-chat", ".txt");
+		Path tempFile = Files.createTempFile(userId + "-chat", ".txt");
 		Files.write(tempFile, content.getBytes());
 		HttpHeaders headers = new HttpHeaders();
 

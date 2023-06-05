@@ -30,7 +30,7 @@ public class User {
 		this.userId = userId;
 		this.userName = userName;
 		this.password = password;
-		this.avatar = CommondUtil.picture.get(random.nextInt(30));
+		this.avatar = CommondUtil.getUserAvatar();
 		this.friendGroups = new ArrayList<>();
 		this.groups = new ArrayList<>();
 		friendGroups.add(new UserInFriend("我的好友", new ArrayList<>()));

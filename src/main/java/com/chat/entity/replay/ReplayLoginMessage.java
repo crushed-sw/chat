@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 登陆请求反馈实体类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

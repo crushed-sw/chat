@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 与聊天有关请求的实体类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

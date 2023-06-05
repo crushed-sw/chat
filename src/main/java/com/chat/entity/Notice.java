@@ -8,6 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
+/**
+ * 通知实体类
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

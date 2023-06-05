@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 与通知有关的请求
+ */
 @Slf4j
 @RestController
 @RequestMapping("/chat/notice")
@@ -37,7 +40,7 @@ public class NoticeController {
 	}
 
 	/**
-	 *
+	 * 有关添加通知的回应
 	 * @param message 获取前端传入的Json
 	 * @return 返回Notice列表对象
 	 */
@@ -48,18 +51,24 @@ public class NoticeController {
 		String userId = message.getUserId();
 		String oppoId = message.getOppositeId();
 
-		System.out.println(message);
-
 		switch (status) {
-			case NoticeMessageJson.ADD_FRIEND ->
-					noticeService.addFriend(userId, oppoId, NoticeMessage.ADD_FRIEND,
-							message.getGroupName(), message.getOppositeGroupName());
-			case NoticeMessageJson.REFUSE_FRIEND ->
-					noticeService.refuseFriend(userId, oppoId, NoticeMessage.ADD_FRIEND);
-			case NoticeMessageJson.ADD_GROUP ->
-					noticeService.addGroup(userId, oppoId, NoticeMessage.ADD_GROUP);
-			case NoticeMessageJson.REFUSE_GROUP ->
-					noticeService.refuseGroup(userId, oppoId, NoticeMessage.ADD_GROUP);
+			case NoticeMessageJson.ADD_FRIEND -> {
+				noticeService.addFriend(userId, oppoId, NoticeMessage.ADD_FRIEND,
+						message.getGroupName(), message.getOppositeGroupName());
+				log.info("[servlet] " + userId + " 同意添加 " + oppoId + " 为好友");
+			}
+			case NoticeMessageJson.REFUSE_FRIEND -> {
+				noticeService.refuseFriend(userId, oppoId, NoticeMessage.ADD_FRIEND);
+				log.info("[servlet] " + userId + " 拒绝添加 " + oppoId + " 为好友");
+			}
+			case NoticeMessageJson.ADD_GROUP -> {
+				noticeService.addGroup(userId, oppoId, NoticeMessage.ADD_GROUP);
+				log.info("[servlet] " + userId + " 同意让 " + oppoId + " 添加群聊");
+			}
+			case NoticeMessageJson.REFUSE_GROUP -> {
+				noticeService.refuseGroup(userId, oppoId, NoticeMessage.ADD_GROUP);
+				log.info("[servlet] " + userId + " 拒绝让 " + oppoId + " 添加群聊");
+			}
 		}
 		return noticeService.getReplayNotice(userId);
 	}

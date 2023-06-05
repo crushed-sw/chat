@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 与好友分组相关的请求
+ */
 @Slf4j
 @RestController
 @RequestMapping("/chat/friendGroup")
@@ -15,6 +18,11 @@ public class FriendGroupController {
 	@Autowired
 	FriendService friendService;
 
+	/**
+	 * 新增好友分组
+	 * @param messageJson 需要新增好友的用户和分组信息
+	 * @return 返回更新后的好友列表
+	 */
 	@UserLoginToken
 	@PostMapping
 	public ReplayFriend insertFriendGroup(@RequestBody FriendMessageJson messageJson) {
@@ -31,6 +39,11 @@ public class FriendGroupController {
 		return replayFriend;
 	}
 
+	/**
+	 * 删除好友分组
+	 * @param messageJson 需要删除好友的用户和分组信息
+	 * @return 返回更新后的好友列表
+	 */
 	@UserLoginToken
 	@DeleteMapping
 	public ReplayFriend deleteFriendGroup(@RequestBody FriendMessageJson messageJson) {
@@ -41,6 +54,11 @@ public class FriendGroupController {
 		return friendService.getReplayFriend(userId);
 	}
 
+	/**
+	 * 修改好友分组名称
+	 * @param messageJson 需要更改好友分组的用户和分组信息
+	 * @return 返回更新后的好友列表
+	 */
 	@UserLoginToken
 	@PutMapping
 	public ReplayFriend updateFriendGroup(@RequestBody FriendMessageJson messageJson) {
