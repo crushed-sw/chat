@@ -330,10 +330,10 @@ public class RedisUtil {
      * @param hashKeys
      * @return 删除成功的 数量
      */
-    public Long delete(String key, String... hashKeys) {
+    public Long delete(String key, Object... hashKeys) {
         return redisTemplate.opsForHash().delete(key, hashKeys);
     }
- 
+
     /**
      * 给指定 hash 的 hashkey 做增减操作
      *
@@ -434,7 +434,7 @@ public class RedisUtil {
      * @param values
      * @return
      */
-    public void leftPushAll(String key, String... values) {
+    public void leftPushAll(String key, Object... values) {
 //        redisTemplate.opsForList().leftPushAll(key,"w","x","y");
         redisTemplate.opsForList().leftPushAll(key, values);
     }
@@ -457,7 +457,7 @@ public class RedisUtil {
      * @param values
      * @return
      */
-    public void rightPushAll(String key, String... values) {
+    public void rightPushAll(String key, Object... values) {
         //redisTemplate.opsForList().leftPushAll(key,"w","x","y");
         redisTemplate.opsForList().rightPushAll(key, values);
     }

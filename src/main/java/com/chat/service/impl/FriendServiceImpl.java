@@ -8,6 +8,7 @@ import com.chat.mapper.NoticeMapping;
 import com.chat.mapper.UserMapping;
 import com.chat.service.FriendService;
 import com.chat.service.UserService;
+import com.chat.util.CommondUtil;
 import com.chat.util.RedisUtil;
 import com.chat.websocket.WebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import java.util.List;
 public class FriendServiceImpl implements FriendService {
 	@Autowired
 	RedisUtil redisUtil;
+	@Autowired
+	CommondUtil commondUtil;
 	@Autowired
 	FriendRepository friendRepository;
 	@Autowired
@@ -41,7 +44,18 @@ public class FriendServiceImpl implements FriendService {
 	 */
 	@Override
 	public void insertFriend(String userId, String friendId, String groupName, String friendGroupName) {
-		String eachId = (String) redisUtil.get("friendEachId");
+		String eachId = "1000001";
+		try {
+			eachId = (String) redisUtil.get("friendEachId");
+		} catch (Exception e) {
+			redisUtil.set("friendEachId", eachId);
+		}
+
+		eachId = "1000001";
+		if(eachId == null) {
+			redisUtil.set("groupId", eachId);
+		}
+
 		int id = Integer.parseInt(eachId);
 		id++;
 		redisUtil.set("friendEachId", Integer.toString(id));

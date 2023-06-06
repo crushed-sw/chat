@@ -27,6 +27,8 @@ public class GroupServiceImpl implements GroupService {
 	@Autowired
 	RedisUtil redisUtil;
 	@Autowired
+	CommondUtil commondUtil;
+	@Autowired
 	UserMapping userMapping;
 	@Autowired
 	GroupMapping groupMapping;
@@ -59,7 +61,18 @@ public class GroupServiceImpl implements GroupService {
 	 */
 	@Override
 	public void createGroup(String userId, String groupName) {
-		String groupId = (String) redisUtil.get("groupId");
+		String groupId = "100001";
+		try {
+			groupId = (String) redisUtil.get("groupId");
+		} catch (Exception e) {
+			redisUtil.set("groupId", groupId);
+		}
+
+		groupId = "100001";
+		if(groupId == null) {
+			redisUtil.set("groupId", groupId);
+		}
+
 		int id = Integer.parseInt(groupId);
 		id++;
 		redisUtil.set("groupId", Integer.toString(id));

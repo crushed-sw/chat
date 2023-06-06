@@ -1,9 +1,0 @@
-POST http://localhost:8080/chat/download
-Content-Type: application/json
-Authorization: b eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4OTk2ZTBhMy43NDQzLjRlOTUuYmFhZi42M2RlNzE1ZmZjMWMiLCJzdWIiOiIxMDEiLCJpc3MiOiJjaGF0IiwiaWF0IjoxNjg1ODAyNzg1LCJleHAiOjE2ODU4ODkxODV9.DZm03SnPTOxQLihgtQxXoK047F6jxgDwplPJ6V-12z0 101
-
-{
-  "status": 3,
-  "fromId": "101",
-  "toId": "102"
-}
