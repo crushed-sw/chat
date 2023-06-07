@@ -68,8 +68,8 @@ public class GroupServiceImpl implements GroupService {
 			redisUtil.set("groupId", groupId);
 		}
 
-		groupId = "100001";
 		if(groupId == null) {
+			groupId = "100001";
 			redisUtil.set("groupId", groupId);
 		}
 
@@ -129,6 +129,8 @@ public class GroupServiceImpl implements GroupService {
 			ReplayWebSocket replay = new ReplayWebSocket();
 			replay.setStatus(ReplayWebSocket.UPDATE_NOTICE);
 			webSocket.sendRemind(groupRecordById.getOwner(), replay);
+
+			redisUtil.delete("chat-" + userId, "group-" + groupId);
 		}
 	}
 
@@ -149,12 +151,17 @@ public class GroupServiceImpl implements GroupService {
 
 			replay.setStatus(ReplayWebSocket.UPDATE_NOTICE);
 			webSocket.sendRemind(crew, replay);
+
+			replay.setId(groupId);
 			replay.setStatus(ReplayWebSocket.UPDATE_GROUP);
 			webSocket.sendRemind(crew, replay);
+
+			redisUtil.delete("chat-" + crew, "group-" + groupId);
 		}
 
 		userMapping.deleteGroup(groupRecord.getOwner(), groupId);
 		groupRepository.deleteById(groupId);
+		redisUtil.delete("chat-" + groupRecord.getOwner(), "group-" + groupId);
 	}
 
 	/**

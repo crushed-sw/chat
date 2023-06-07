@@ -51,8 +51,8 @@ public class FriendServiceImpl implements FriendService {
 			redisUtil.set("friendEachId", eachId);
 		}
 
-		eachId = "1000001";
 		if(eachId == null) {
+			eachId = "1000001";
 			redisUtil.set("groupId", eachId);
 		}
 
@@ -113,7 +113,11 @@ public class FriendServiceImpl implements FriendService {
 
 		ReplayWebSocket replay = new ReplayWebSocket();
 		replay.setStatus(ReplayWebSocket.UPDATE_FRIEND);
+		replay.setId(userId);
 		webSocket.sendRemind(friendId, replay);
+
+		redisUtil.delete("chat-" + friendId, "friend-" + userId);
+		redisUtil.delete("chat-" + userId, "friend-" + friendId);
 	}
 
 	/**
