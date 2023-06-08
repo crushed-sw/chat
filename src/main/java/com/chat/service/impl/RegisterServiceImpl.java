@@ -31,6 +31,21 @@ public class RegisterServiceImpl implements RegisterService {
 	 */
 	@Override
 	public ReplayRegisterMessage getRegisterMessage(String userId, String password, String userName) {
+		return judgeChinese(userId, password, userName);
+	}
+
+	/**
+	 * 判断userId是否合法
+	 * @param userId
+	 * @param password
+	 * @param userName
+	 * @return
+	 */
+	private ReplayRegisterMessage judgeChinese(String userId, String password, String userName) {
+		if(!userId.matches("^[a-zA-Z0-9]*$")) {
+			return ReplayRegisterMessage.USER_ID_IS_CHINESE;
+		}
+
 		return judgeNotNull(userId, password, userName);
 	}
 

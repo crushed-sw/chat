@@ -1,6 +1,10 @@
 package com.chat.util;
 
 import com.chat.entity.User;
+import com.chat.mapper.UserMapping;
+import com.chat.mapper.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Random;
@@ -9,7 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 缓存工具类
  */
+@Component
 public class CacheUtil {
+	@Autowired
+	UserRepository userRepository;
+	@Autowired
+	UserMapping userMapping;
+
 	private static final Map<String, User> userCache = new ConcurrentHashMap<>();
 
 	/**
@@ -17,7 +27,7 @@ public class CacheUtil {
 	 * @param userId 用户ID
 	 * @return 用户类
 	 */
-	public static User getUserInCache(String userId) {
+	public User getUserInCache(String userId) {
 		return userCache.get(userId);
 	}
 
@@ -25,25 +35,29 @@ public class CacheUtil {
 	 * 将用户添加到缓存
 	 * @param user 用户类
 	 */
-	public static void setUserInCache(User user) {
-		deleteCache(userCache, 1000);
-		userCache.put(user.getUserId(), user);
-	}
+	public void setUserInCache(String userId, User user) {
+		userCache.put(userId, user);
 
-	/**
-	 * 如果缓存已满，随机删除一个缓存对象
-	 * @param map 缓存
-	 * @param maxsize 最大缓存数量
-	 */
-	private static void deleteCache(Map<String, ?> map, int maxsize) {
-		if(map.size() >= maxsize) {
+		if(userCache.size() >= 1000) {
 			Random random = new Random();
 
-			int randomIndex = random.nextInt(map.size());
-			map.entrySet().stream()
+			int randomIndex = random.nextInt(userCache.size());
+			userCache.entrySet().stream()
 					.skip(randomIndex)
 					.findFirst()
-					.ifPresent(entry -> map.remove(entry.getKey()));
+					.ifPresent(entry -> {
+						userRepository.save(entry.getValue());
+						userCache.remove(entry.getKey());
+					});
 		}
+	}
+
+	public void deleteUserInCache(String userId) {
+		userCache.remove(userId);
+	}
+
+	public boolean isInCache(String userId) {
+		User user = getUserInCache(userId);
+		return user != null;
 	}
 }

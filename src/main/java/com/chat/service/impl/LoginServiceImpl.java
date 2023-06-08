@@ -32,11 +32,24 @@ public class LoginServiceImpl implements LoginService {
 	 * @return
 	 */
 	public ReplayLoginMessage getReplayLoginMessage(String userId, String password) {
+		return judgeChinese(userId, password);
+	}
+
+	/**
+	 * 判断userId是否合法
+	 * @param userId
+	 * @param password
+	 * @return
+	 */
+	private ReplayLoginMessage judgeChinese(String userId, String password) {
+		if(!userId.matches("^[a-zA-Z0-9]*$")) {
+			return ReplayLoginMessage.USER_ID_CHINESE;
+		}
 		return judgeNotNll(userId, password);
 	}
 
 	/**
-	 * 判断俩阐述是否为空
+	 * 判断俩参数是否为空
 	 * @param userId
 	 * @param password
 	 * @return

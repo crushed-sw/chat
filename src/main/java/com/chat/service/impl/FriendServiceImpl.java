@@ -8,6 +8,7 @@ import com.chat.mapper.NoticeMapping;
 import com.chat.mapper.UserMapping;
 import com.chat.service.FriendService;
 import com.chat.service.UserService;
+import com.chat.util.CacheUtil;
 import com.chat.util.CommondUtil;
 import com.chat.util.RedisUtil;
 import com.chat.websocket.WebSocket;
@@ -22,6 +23,8 @@ public class FriendServiceImpl implements FriendService {
 	RedisUtil redisUtil;
 	@Autowired
 	CommondUtil commondUtil;
+	@Autowired
+	CacheUtil cacheUtil;
 	@Autowired
 	FriendRepository friendRepository;
 	@Autowired
@@ -67,7 +70,8 @@ public class FriendServiceImpl implements FriendService {
 		userMapping.appendFriend(userId, groupName, friendId, eachId, friend.getUserName(), friend.getAvatar());
 		userMapping.appendFriend(friendId, friendGroupName, userId, eachId, user.getUserName(), user.getAvatar());
 
-
+		cacheUtil.deleteUserInCache(userId);
+		cacheUtil.deleteUserInCache(friendId);
 	}
 
 	/**
@@ -111,6 +115,9 @@ public class FriendServiceImpl implements FriendService {
 		userMapping.deleteFriend(userId, groupName, friendId);
 		userMapping.deleteFriend(friendId, friendGroupName, userId);
 
+		cacheUtil.deleteUserInCache(userId);
+		cacheUtil.deleteUserInCache(friendId);
+
 		ReplayWebSocket replay = new ReplayWebSocket();
 		replay.setStatus(ReplayWebSocket.UPDATE_FRIEND);
 		replay.setId(userId);
@@ -148,6 +155,8 @@ public class FriendServiceImpl implements FriendService {
 
 		userMapping.deleteFriend(userId, oldGroupName, friendId);
 		userMapping.appendFriend(userId, newGroupName, friendId, eachId, friendName, avatar);
+
+		cacheUtil.deleteUserInCache(userId);
 	}
 
 	/**
@@ -177,6 +186,8 @@ public class FriendServiceImpl implements FriendService {
 		}
 
 		userMapping.appendFriendGroup(userId, groupName);
+
+		cacheUtil.deleteUserInCache(userId);
 		return true;
 	}
 
@@ -189,6 +200,7 @@ public class FriendServiceImpl implements FriendService {
 	public void deleteFriendGroup(String userId, String groupName) {
 		if (!"我的好友".equals(groupName.trim())) {
 			userMapping.deleteFriendGroup(userId, groupName);
+			cacheUtil.deleteUserInCache(userId);
 		}
 	}
 

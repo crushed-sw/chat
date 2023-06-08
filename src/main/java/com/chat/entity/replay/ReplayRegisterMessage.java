@@ -11,6 +11,7 @@ import lombok.Data;
 public class ReplayRegisterMessage {
 	public static final ReplayRegisterMessage USER_ID_EXIT = new ReplayRegisterMessage(false, 1);
 	public static final ReplayRegisterMessage USER_ID_OR_PASSWORD_NULL = new ReplayRegisterMessage(false, 2);
+	public static final ReplayRegisterMessage USER_ID_IS_CHINESE = new ReplayRegisterMessage(false, 3);
 
 	private static ReplayRegisterMessage SUCCEED_REGISTER = new ReplayRegisterMessage(true, 0);
 

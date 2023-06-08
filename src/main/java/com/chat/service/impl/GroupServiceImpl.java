@@ -9,6 +9,7 @@ import com.chat.entity.replay.ReplayWebSocket;
 import com.chat.mapper.*;
 import com.chat.service.GroupService;
 import com.chat.service.UserService;
+import com.chat.util.CacheUtil;
 import com.chat.util.CommondUtil;
 import com.chat.util.RedisUtil;
 import com.chat.websocket.WebSocket;
@@ -26,6 +27,8 @@ import java.util.Optional;
 public class GroupServiceImpl implements GroupService {
 	@Autowired
 	RedisUtil redisUtil;
+	@Autowired
+	CacheUtil cacheUtil;
 	@Autowired
 	CommondUtil commondUtil;
 	@Autowired
@@ -52,6 +55,7 @@ public class GroupServiceImpl implements GroupService {
 	public void insertGroup(String userId, String groupId) {
 		userMapping.appendGroup(userId, groupId);
 		groupMapping.appendCrew(groupId, userId);
+		cacheUtil.deleteUserInCache(userId);
 	}
 
 	/**
@@ -78,6 +82,7 @@ public class GroupServiceImpl implements GroupService {
 		redisUtil.set("groupId", Integer.toString(id));
 		groupRepository.save(new GroupChatRecord(groupId, userId, CommondUtil.getGroupAvatar(), groupName, new ArrayList<>(), new ArrayList<>()));
 		userMapping.appendGroup(userId, groupId);
+		cacheUtil.deleteUserInCache(userId);
 	}
 
 	/**
@@ -125,6 +130,7 @@ public class GroupServiceImpl implements GroupService {
 
 			userMapping.deleteGroup(userId, groupId);
 			groupMapping.deleteCrew(groupId, userId);
+			cacheUtil.deleteUserInCache(userId);
 
 			ReplayWebSocket replay = new ReplayWebSocket();
 			replay.setStatus(ReplayWebSocket.UPDATE_NOTICE);
@@ -144,6 +150,7 @@ public class GroupServiceImpl implements GroupService {
 		ReplayWebSocket replay = new ReplayWebSocket();
 		for (String crew : crews) {
 			userMapping.deleteGroup(crew, groupId);
+			cacheUtil.deleteUserInCache(crew);
 
 			NoticeMessage message = new NoticeMessage(NoticeMessage.MESSAGE_NOTICE,
 					groupId, groupRecord.getAvatar(), groupRecord.getName(), "该群已被解散");
@@ -160,6 +167,7 @@ public class GroupServiceImpl implements GroupService {
 		}
 
 		userMapping.deleteGroup(groupRecord.getOwner(), groupId);
+		cacheUtil.deleteUserInCache(groupRecord.getOwner());
 		groupRepository.deleteById(groupId);
 		redisUtil.delete("chat-" + groupRecord.getOwner(), "group-" + groupId);
 	}

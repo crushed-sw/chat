@@ -16,6 +16,8 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository repository;
+	@Autowired
+	CacheUtil cacheUtil;
 
 	/**
 	 * 给数据库添加用户信息
@@ -25,7 +27,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public void insertUser(String userId, String userName, String password) {
-		repository.save(new User(userId, userName, password));
+		User user = new User(userId, userName, password);
+		repository.save(user);
+		cacheUtil.setUserInCache(userId, user);
 	}
 
 	/**
@@ -35,7 +39,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public User getUserById(String userId) {
-		User user = CacheUtil.getUserInCache(userId);
+		User user = cacheUtil.getUserInCache(userId);
 		return user == null ? getUserByIdInDatabase(userId) : user;
 	}
 
@@ -50,6 +54,7 @@ public class UserServiceImpl implements UserService {
 		if(byId.isPresent()) {
 			user = byId.get();
 		}
+		cacheUtil.setUserInCache(userId, user);
 		return user;
 	}
 }
